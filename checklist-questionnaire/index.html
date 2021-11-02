@@ -3,8 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <title>Checklist Questionnaire Prototype</title>
+  <link href="design.css" rel="stylesheet" type="text/css">
 </head>
 <body>
+
   <h1>Checklist Questionnaire Prototype</h1>
+
+  <article class="question">
+    <header>
+      <div class="question-index"></div>
+      <div class="question-topic"></div>
+      <div class="question-title"></div>
+      <div class="question-text"></div>
+    </header>
+    <section class="answers">
+      <label>
+        <input type="radio" name="answer" value="1">
+        Never happens / Not a practice
+      </label>
+      <label>
+        <input type="radio" name="answer" value="2">
+        Trialed and known / Still only an ambition
+      </label>
+      <label>
+        <input type="radio" name="answer" value="3">
+        Just introduced / Happens sometimes
+      </label>
+      <label>
+        <input type="radio" name="answer" value="4">
+        Well-established practice / Our normal way of working
+      </label>
+      <label>
+        <input type="radio" name="answer" value="5">
+        We're experts / Others could learn from us
+      </label>
+      <label>
+        <input type="radio" name="answer" value="101">
+        We don't know enough to assess ourselves and want to learn more about this practice
+      </label>
+      <label>
+        <input type="radio" name="answer" value="102">
+        This practice is not applicable to our team
+      </label>
+    </section>
+    <footer>
+      <button id="GoNext">Go Next</button>
+      <hr>
+      <button id="GoBack">Go Back</button>
+      <button id="GoSummary" disabled>Skip to Recommendations</button>
+    </footer>
+  </article>
+
+  <script src="data.js"></script>
+  <script>
+    // data.js → questionnaire: {questions:[{...}]}
+    let currentQuestionIndex = 0;
+    let totalQuestionCount = questionnaire.questions.length;
+
+    const domIndex = document.getElementsByClassName('question-index')[0];
+    const domTopic = document.getElementsByClassName('question-topic')[0];
+    const domTitle = document.getElementsByClassName('question-title')[0];
+    const domText  = document.getElementsByClassName('question-text')[0];
+
+    const domAnswers = document.getElementsByName('answer');
+
+    const domNext = document.getElementById('GoNext');
+    const domBack = document.getElementById('GoBack');
+    const domSummary = document.getElementById('GoSummary');
+
+    domNext.addEventListener('click', f=>GoNext());
+    domBack.addEventListener('click', f=>GoBack());
+
+    const getCurrentAnswerValue = () => {
+      var ele = domAnswers;
+      for(i = 0; i < ele.length; i++)
+        if(ele[i].checked)
+          return ele[i].value;
+      return 0;
+    }
+    const setCurrentAnswerValue = (v) => {
+      var ele = domAnswers;
+      for(i = 0; i < ele.length; i++) {
+        if  (ele[i].value*1===v*1) ele[i].checked = true;
+        else ele[i].checked = false;
+      }
+    }
+    const setButtonDisabled = () => {
+      domNext.disabled = currentQuestionIndex >= totalQuestionCount;
+      domBack.disabled = currentQuestionIndex <= 1;
+    }
+
+    const Start = (from = 1) => {
+      currentQuestionIndex = from;
+      DisplayQuestion(currentQuestionIndex);
+    }
+    const SaveCurrent = () => {
+      const i = currentQuestionIndex - 1;
+      questionnaire.questions[i].answer = getCurrentAnswerValue();
+      console.log({...questionnaire.questions[i]})
+    }
+    const GoNext = () => {
+      SaveCurrent();
+      currentQuestionIndex++;
+      if (currentQuestionIndex>totalQuestionCount) GoSummary();
+      else DisplayQuestion(currentQuestionIndex);
+    }
+    const GoBack = () => {
+      SaveCurrent();
+      currentQuestionIndex--;
+      if (currentQuestionIndex<1) GoSummary();
+      else DisplayQuestion(currentQuestionIndex);
+    }
+    const GoSummary = () => {
+      console.log('Summary');
+    }
+
+    const DisplayQuestion = (questionIndex) => {
+      const questionData = questionnaire.questions[questionIndex - 1];
+      domIndex.innerText = questionIndex+'/'+totalQuestionCount;
+      domTopic.innerText = questionData.topic;
+      domTitle.innerText = questionData.title;
+      domText.innerText  = questionData.text;
+      setCurrentAnswerValue(questionData.answer);
+      setButtonDisabled();
+    }
+
+    Start();
+
+  </script>
+
+
+
+
 </body>
 </html>

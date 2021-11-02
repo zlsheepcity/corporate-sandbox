@@ -1,0 +1,25 @@
+body {
+  padding: 0 4rem;
+  font-family: sans-serif;
+}
+
+.question {
+  max-width: 56em;
+}
+
+.question-topic { font-weight: bolder; }
+.question-title { font-size:2rem; }
+.question-text { min-height: 6rem; }
+
+.answers { padding: 2rem 0; }
+
+.answers label {
+  display:block;
+  padding: 0.25rem;
+}
+.answers label:nth-child(6) { margin-top: 1rem;}
+.answers label:hover { background-color: rgba(0,0,0,0.05); }
+
+button {
+  font-size: 1.5rem;
+}
