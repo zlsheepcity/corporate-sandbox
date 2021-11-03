@@ -2,24 +2,57 @@ body {
   padding: 0 4rem;
   font-family: sans-serif;
 }
-
-.question {
+article {
   max-width: 56em;
+  margin-bottom: 2rem;
 }
-
-.question-topic { font-weight: bolder; }
-.question-title { font-size:2rem; }
-.question-text { min-height: 6rem; }
-
-.answers { padding: 2rem 0; }
-
+.hidden {
+  display: none;
+}
+.intro-actions {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+.intro footer {
+  background-color: hsl(45, 100%, 76%); /* sticky-yellow */
+  color: hsl(14, 25%, 29%);
+  padding: 2rem;
+  margin-top: 4rem;
+}
+.question header {
+  padding-bottom: 2rem;
+}
+.question-topic {
+  font-weight: bolder;
+}
+.question-title {
+  font-size:2rem;
+}
+.question-text {
+  min-height: 6rem;
+}
 .answers label {
   display:block;
   padding: 0.25rem;
 }
-.answers label:nth-child(6) { margin-top: 1rem;}
 .answers label:hover { background-color: rgba(0,0,0,0.05); }
-
+.answers label:nth-child(6) { margin-top: 1rem;}
+.comment {
+  padding: 1rem 0;
+}
+.comment textarea {
+  width: 80%;
+  height: 3rem;
+}
 button {
   font-size: 1.5rem;
+}
+.results div {
+  display: block;
+  line-height: 1;
+  white-space: pre-wrap;
+  font-family: monospace;
+  font-size: small;
+  padding: 0.5rem 0;
 }

@@ -9,7 +9,36 @@
 
   <h1>Checklist Questionnaire Prototype</h1>
 
-  <article class="question">
+  <article id="screenIntro" class="intro">
+    <header>
+      <p>If you are just forming as a team, try to incorporate as many of the Going Further practices as possible from the beginning, especially around Quality</p>
+    </header>
+    <section class="intro-actions">
+      <div>
+        <button id="GettingStarted">Getting Started</button>
+      </div>
+      <div>
+        <button id="GoingFurther">Going Further</button>
+        <div>
+          (go to question #3)
+        </div>
+      </div>
+    </section>
+    <footer>
+        <h4>prototype info</h4>
+        <p>v1 / 2021.11.3</p>
+        data sheet:
+        <p>
+        <a href="https://docs.google.com/spreadsheets/d/17farDTTsAigWeVEDKqlLy3DHpUrLuPwgUyWbDdv6NS0/edit?usp=sharing">https://docs.google.com/spreadsheets/d/17farDTTsAigWeVEDKqlLy3DHpUrLuPwgUyWbDdv6NS0/edit?usp=sharing</a>
+        </p>
+        code source:
+        <p>
+        <a href="https://github.com/zlsheepcity/corporate-sandbox/tree/main/checklist-questionnaire">https://github.com/zlsheepcity/corporate-sandbox/tree/main/checklist-questionnaire</a>
+        </p>
+    </footer>
+  </article>
+
+  <article id="screenQuestion" class="question">
     <header>
       <div class="question-index"></div>
       <div class="question-topic"></div>
@@ -46,60 +75,103 @@
         This practice is not applicable to our team
       </label>
     </section>
+    <section class="comment">
+      Comments<br>
+      <textarea name="comment" id="TextComment" placeholder="How are you applying this practice? How could you improve?"></textarea>
+    </section>
     <footer>
-      <button id="GoNext">Go Next</button>
+      <button id="GoNext">Submit Answer</button>
       <hr>
       <button id="GoBack">Go Back</button>
-      <button id="GoSummary" disabled>Skip to Recommendations</button>
+      <button id="GoSummary">Skip to Recommendations</button>
+    </footer>
+  </article>
+
+  <article id="screenSummary" class="summary">
+    <header>Raw Results</header>
+    <div class="results"></div>
+    <hr>
+    <footer>
+      <button id="Restart">Go Start</button>
     </footer>
   </article>
 
   <script src="data.js"></script>
   <script>
+    const DOM = {
+      screenIntro:       document.getElementById('screenIntro'),
+      screenQuestion:    document.getElementById('screenQuestion'),
+      screenSummary:     document.getElementById('screenSummary'),
+      btnGettingStarted: document.getElementById('GettingStarted'),
+      btnGoingFurther:   document.getElementById('GoingFurther'),
+      btnRestart:        document.getElementById('Restart'),
+      btnNext: document.getElementById('GoNext'),
+      btnBack: document.getElementById('GoBack'),
+      btnSummary: document.getElementById('GoSummary'),
+      qIndex: document.getElementsByClassName('question-index')[0],
+      qTopic: document.getElementsByClassName('question-topic')[0],
+      qTitle: document.getElementsByClassName('question-title')[0],
+      qText: document.getElementsByClassName('question-text')[0],
+      qAnswers: document.getElementsByName('answer'),
+      qComment: document.getElementById('TextComment'),
+      results: document.getElementsByClassName('results')[0],
+    }
+
+    DOM.btnGettingStarted.addEventListener('click', f=>StartAsking(1));
+    DOM.btnGoingFurther.addEventListener('click', f=>StartAsking(3));
+    DOM.btnRestart.addEventListener('click', f=>GoHome());
+    DOM.btnNext.addEventListener('click', f=>GoNext());
+    DOM.btnBack.addEventListener('click', f=>GoBack());
+    DOM.btnSummary.addEventListener('click', f=>GoSummary());
+  </script>
+
+  <script>
     // data.js → questionnaire: {questions:[{...}]}
     let currentQuestionIndex = 0;
     let totalQuestionCount = questionnaire.questions.length;
 
-    const domIndex = document.getElementsByClassName('question-index')[0];
-    const domTopic = document.getElementsByClassName('question-topic')[0];
-    const domTitle = document.getElementsByClassName('question-title')[0];
-    const domText  = document.getElementsByClassName('question-text')[0];
-
-    const domAnswers = document.getElementsByName('answer');
-
-    const domNext = document.getElementById('GoNext');
-    const domBack = document.getElementById('GoBack');
-    const domSummary = document.getElementById('GoSummary');
-
-    domNext.addEventListener('click', f=>GoNext());
-    domBack.addEventListener('click', f=>GoBack());
-
     const getCurrentAnswerValue = () => {
-      var ele = domAnswers;
+      const ele = DOM.qAnswers;
       for(i = 0; i < ele.length; i++)
         if(ele[i].checked)
           return ele[i].value;
       return 0;
     }
     const setCurrentAnswerValue = (v) => {
-      var ele = domAnswers;
-      for(i = 0; i < ele.length; i++) {
-        if  (ele[i].value*1===v*1) ele[i].checked = true;
-        else ele[i].checked = false;
-      }
+      const ele = DOM.qAnswers;
+      let eleSetDefault = true;
+      for(i = 0; i < ele.length; i++)
+        if (ele[i].value*1===v*1) {
+          ele[i].checked = true;
+          eleSetDefault = false;
+        } else
+          ele[i].checked = false;
+      if (eleSetDefault) ele[ele.length-1].checked = true;
     }
     const setButtonDisabled = () => {
-      domNext.disabled = currentQuestionIndex >= totalQuestionCount;
-      domBack.disabled = currentQuestionIndex <= 1;
+      DOM.btnNext.disabled = currentQuestionIndex > totalQuestionCount;
+      DOM.btnBack.disabled = currentQuestionIndex < 1;
+    }
+    const DisplayScreen = screen => {
+      DOM.screenIntro.classList.add('hidden');
+      DOM.screenQuestion.classList.add('hidden');
+      DOM.screenSummary.classList.add('hidden');
+      DOM[screen].classList.remove('hidden');
     }
 
-    const Start = (from = 1) => {
+    const GoHome = () => {
+      DisplayScreen('screenIntro');
+      currentQuestionIndex = 0;
+    }
+    const StartAsking = (from = 1) => {
+      DisplayScreen('screenQuestion');
       currentQuestionIndex = from;
       DisplayQuestion(currentQuestionIndex);
     }
     const SaveCurrent = () => {
       const i = currentQuestionIndex - 1;
       questionnaire.questions[i].answer = getCurrentAnswerValue();
+      questionnaire.questions[i].comment = DOM.qComment.value;
       console.log({...questionnaire.questions[i]})
     }
     const GoNext = () => {
@@ -111,29 +183,37 @@
     const GoBack = () => {
       SaveCurrent();
       currentQuestionIndex--;
-      if (currentQuestionIndex<1) GoSummary();
+      if (currentQuestionIndex<1) GoHome();
       else DisplayQuestion(currentQuestionIndex);
     }
     const GoSummary = () => {
-      console.log('Summary');
+      DisplayScreen('screenSummary');
+      const questionData = questionnaire.questions;
+      DOM.results.innerText = ''
+      questionData.map( q => {
+        const div = document.createElement('div');
+        let { topic, title, answer, comment } = q || {};
+        div.innerText = JSON.stringify({
+          topic, title, answer, comment
+        });
+        DOM.results.append(div);
+      })
     }
-
     const DisplayQuestion = (questionIndex) => {
       const questionData = questionnaire.questions[questionIndex - 1];
-      domIndex.innerText = questionIndex+'/'+totalQuestionCount;
-      domTopic.innerText = questionData.topic;
-      domTitle.innerText = questionData.title;
-      domText.innerText  = questionData.text;
+      DOM.qIndex.innerText = questionIndex+'/'+totalQuestionCount;
+      DOM.qTopic.innerText = questionData.topic;
+      DOM.qTitle.innerText = questionData.title;
+      DOM.qText.innerText  = questionData.text;
+      DOM.qComment.value = questionData.comment;
       setCurrentAnswerValue(questionData.answer);
       setButtonDisabled();
     }
 
-    Start();
+    // StartAsking();
+    GoHome();
 
   </script>
-
-
-
 
 </body>
 </html>
