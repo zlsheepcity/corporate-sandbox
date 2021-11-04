@@ -7,6 +7,8 @@
 </head>
 <body>
 
+  <script src="data.js"></script>
+
   <h1>Checklist Questionnaire Prototype</h1>
 
   <article id="screenIntro" class="intro">
@@ -20,7 +22,11 @@
       <div>
         <button id="GoingFurther">Going Further</button>
         <div>
-          (go to question #3)
+          (go to question
+          #<script>
+            document.write(questionnaire.goingFutherStartsFrom)
+          </script>
+          )
         </div>
       </div>
     </section>
@@ -96,7 +102,6 @@
     </footer>
   </article>
 
-  <script src="data.js"></script>
   <script>
     const DOM = {
       screenIntro:       document.getElementById('screenIntro'),
@@ -118,7 +123,7 @@
     }
 
     DOM.btnGettingStarted.addEventListener('click', f=>StartAsking(1));
-    DOM.btnGoingFurther.addEventListener('click', f=>StartAsking(3));
+    DOM.btnGoingFurther.addEventListener('click', f=>StartAsking(questionnaire.goingFutherStartsFrom));
     DOM.btnRestart.addEventListener('click', f=>GoHome());
     DOM.btnNext.addEventListener('click', f=>GoNext());
     DOM.btnBack.addEventListener('click', f=>GoBack());

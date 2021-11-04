@@ -28,6 +28,7 @@ article {
 }
 .question-title {
   font-size:2rem;
+  min-height: 7rem;
 }
 .question-text {
   min-height: 6rem;
